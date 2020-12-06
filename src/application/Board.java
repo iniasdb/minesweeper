@@ -1,6 +1,8 @@
 package application;
 
 
+import java.util.ArrayList;
+
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
@@ -46,9 +48,10 @@ public class Board {
 
 		//add event listener
 		tile.setOnMouseClicked(e -> {
-			if (e.getButton() == MouseButton.PRIMARY) {
-				tile.reveal(i, j);
-			} else {
+			if (e.getButton() == MouseButton.PRIMARY && !tile.isFlagged()) {
+				createNeighborList(tile, i, j);
+				tile.reveal();
+			} else if (e.getButton() == MouseButton.SECONDARY) {
 				tile.flag();
 			}
 		});
@@ -81,7 +84,6 @@ public class Board {
 	public void getBombs(Tile tile, int i, int j) {
 		if (tile.isBomb()) {
 			bombArray[i][j] = true;
-			tile.setFill(Color.BLACK);
 			bombsAmount++;
 		} else {
 			bombArray[i][j] = false;
@@ -96,9 +98,6 @@ public class Board {
 
 		//add to values array  (mainly for debug)
 		values[i][j] = bombs;
-
-
-
 		
 		//set the tiles value to the amount of bombs
 		tileArray[i][j].setValue(values[i][j]);
@@ -150,6 +149,21 @@ public class Board {
 			}		
 			return temp;
 		}
+	}
+	
+	public void createNeighborList(Tile tile, int i, int j) {
+		ArrayList<Tile> neighbors = new ArrayList<Tile>();
+		
+		neighbors.add(tileArray[i-1][j-1]);
+		neighbors.add(tileArray[i-1][j]);
+		neighbors.add(tileArray[i-1][j+1]);
+		neighbors.add(tileArray[i][j-1]);
+		neighbors.add(tileArray[i][j+1]);
+		neighbors.add(tileArray[i+1][j-1]);
+		neighbors.add(tileArray[i+1][j]);
+		neighbors.add(tileArray[i+1][j+1]);
+		
+		tile.setNeighbors(neighbors);
 	}
 	
 	
