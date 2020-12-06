@@ -1,5 +1,7 @@
 package application;
 
+import java.util.ArrayList;
+
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
@@ -37,27 +39,42 @@ public class Tile extends Rectangle {
 	}
 	
 	//run when clicked on tile
-	public void reveal(int i, int j) {
-				
+	public void reveal() {
+		
+		//check if tile has bomb
 		if (hasBomb) {
+			//set tile bomb image
 			this.setFill(new ImagePattern(new Image(getClass().getResource("images/bomb.png").toExternalForm())));
-			System.out.println("game over");
+			//load game over method
 			Controller.gameOver();
 		} else {
-			//debug
-			System.out.println("ja");
-			System.out.println(this.getValue());
 			//set tile image (check for empty rects and bombs
-			System.out.println(this.value);
 			if (this.value != 0 && this.value != 8) {
 				this.setFill(new ImagePattern(new Image(getClass().getResource("images/"+this.value+".png").toExternalForm()))); //fill rect with value image
-			} else if (this.value == 0) {
-				this.setFill(Color.BEIGE);
+			} else /*if (this.value == 0)*/ {
+				try {
+					checkNeighbors();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				this.setFill(Color.BROWN);
 			}
 			//make unclickable
 			this.setDisable(true);
 		}
 		
+	}
+	
+	public void checkNeighbors() {
+		System.out.println(this.neighbors);
+		for (int i = 0; i < this.neighbors.size(); i++) {
+			if (!this.neighbors.get(i).hasBomb || !this.neighbors.get(i).isDisable()) {
+				System.out.println("ja");
+				this.neighbors.get(i).reveal();
+			} else {
+				System.out.println("nee");
+			}
+		}
 	}
 	
 	public boolean isBomb() {
@@ -72,12 +89,12 @@ public class Tile extends Rectangle {
 		return this.value;
 	}
 	
-	public void setImage(Image img) {
-		this.img = img;
+	public void setNeighbors(ArrayList<Tile> neighbors) {
+		this.neighbors = neighbors;
 	}
 	
-	public Image getImgage() {
-		return this.img;
+	public ArrayList<Tile> getNeighbors() {
+		return this.neighbors;
 	}
 	
 	private int tileSize = 20;
@@ -85,4 +102,5 @@ public class Tile extends Rectangle {
 	private boolean flagged = false;
 	private int value;
 	private Image img;
+	private ArrayList<Tile> neighbors;
 }
