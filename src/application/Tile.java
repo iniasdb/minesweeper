@@ -51,7 +51,7 @@ public class Tile extends Rectangle {
 			//set tile image (check for empty rects and bombs
 			if (this.value != 0 && this.value != 8) {
 				this.setFill(new ImagePattern(new Image(getClass().getResource("images/"+this.value+".png").toExternalForm()))); //fill rect with value image
-			} else /*if (this.value == 0)*/ {
+			} else if (this.value == 0) {
 				try {
 					checkNeighbors();
 				} catch (Exception e) {
@@ -68,11 +68,8 @@ public class Tile extends Rectangle {
 	public void checkNeighbors() {
 		System.out.println(this.neighbors);
 		for (int i = 0; i < this.neighbors.size(); i++) {
-			if (!this.neighbors.get(i).hasBomb || !this.neighbors.get(i).isDisable()) {
-				System.out.println("ja");
+			if (!this.neighbors.get(i).hasBomb && !this.neighbors.get(i).isDisable()) {
 				this.neighbors.get(i).reveal();
-			} else {
-				System.out.println("nee");
 			}
 		}
 	}
@@ -101,6 +98,5 @@ public class Tile extends Rectangle {
 	private boolean hasBomb;
 	private boolean flagged = false;
 	private int value;
-	private Image img;
 	private ArrayList<Tile> neighbors;
 }

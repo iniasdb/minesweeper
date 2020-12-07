@@ -3,10 +3,8 @@ package application;
 
 import java.util.ArrayList;
 
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 
 public class Board {
 
@@ -31,6 +29,14 @@ public class Board {
 		this.height = height;
 	}
 	
+	public int getBombsFound() {
+		return this.bombsFound;
+	}
+	
+	public int getBombsAmount() {
+		return this.bombsAmount;
+	}
+	
 	public void createTile(GridPane gPane, int j, int i) {
 		//place random bombs
 		boolean bomb = false;
@@ -46,14 +52,16 @@ public class Board {
 	    //create tile
 		Tile tile = new Tile(bomb);
 
+		//createNeighborList(tile, i, j);  //werkt ni omda het checkt voor tegels die nog ni gemaakt zijn, moet buiten loop
+		
 		//add event listener
 		tile.setOnMouseClicked(e -> {
 			if (e.getButton() == MouseButton.PRIMARY && !tile.isFlagged()) {
-				createNeighborList(tile, i, j);
 				tile.reveal();
 			} else if (e.getButton() == MouseButton.SECONDARY) {
 				tile.flag();
 			}
+			checkWinConditions(i, j);
 		});
 		
 		//add tile to tileArray
@@ -66,16 +74,18 @@ public class Board {
 		
 	}
 	
-	//debug
-	public void printValues() {
-		for (int i = 0; i < values.length; i++) {
-			for (int j = 0; j < values.length; j++) {
-				System.out.print(values[i][j]);
-			}
-			System.out.println();
+	public void checkWinConditions(int i, int j) {
+
+		if (tileArray[i][j].isFlagged() && tileArray[i][j].isBomb()) {
+			bombsFound++;
+		}
+
+		System.out.println(bombsAmount + " " + bombsFound);
+		if (bombsFound == bombsAmount) {
+			Controller.gameWon();
 		}
 	}
-	
+		
 	public void createTileArray(Tile tile, int i, int j) {
 		tileArray[i][j] = tile;
 	}
@@ -151,7 +161,7 @@ public class Board {
 		}
 	}
 	
-	public void createNeighborList(Tile tile, int i, int j) {
+	public void createNeighborList(int i, int j) {
 		ArrayList<Tile> neighbors = new ArrayList<Tile>();
 		
 		neighbors.add(tileArray[i-1][j-1]);
@@ -163,7 +173,11 @@ public class Board {
 		neighbors.add(tileArray[i+1][j]);
 		neighbors.add(tileArray[i+1][j+1]);
 		
-		tile.setNeighbors(neighbors);
+		try {
+			tileArray[i][j].setNeighbors(neighbors);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -171,6 +185,7 @@ public class Board {
 	int width;
 	int height;
 	int bombsAmount = 0;
+	int bombsFound = 0;
 	int bombsWanted = 50;
 	int prob = 13;
 	
